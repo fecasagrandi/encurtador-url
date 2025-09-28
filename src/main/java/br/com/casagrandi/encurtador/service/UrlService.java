@@ -1,7 +1,9 @@
 package br.com.casagrandi.encurtador.service;
 
 import br.com.casagrandi.encurtador.model.Url;
+import br.com.casagrandi.encurtador.model.Usuario;
 import br.com.casagrandi.encurtador.repository.UrlRepository;
+import br.com.casagrandi.encurtador.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,28 +12,36 @@ import java.util.Random;
 @Service
 public class UrlService {
 
-    private final UrlRepository repository;
+    private final UrlRepository urlRepository;
+    private final UsuarioRepository usuarioRepository;
     private final Random random = new Random();
 
-    public UrlService(UrlRepository repository) {
-        this.repository = repository;
+    public UrlService(UrlRepository urlRepository, UsuarioRepository usuarioRepository) {
+        this.urlRepository = urlRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public Url encurtar(Long usuarioId, String urlOriginal) {
+        // Busca o usuário pelo ID
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+
         Url url = new Url();
-        url.setUsuarioId(usuarioId);
+        url.setUsuario(usuario);
         url.setUrlOriginal(urlOriginal);
         url.setCodigoCurto(gerarCodigo());
-        return repository.save(url);
+        url.setAcessos(0L);
+
+        return urlRepository.save(url);
     }
 
     public Optional<Url> buscarPorCodigo(String codigo) {
-        return repository.findByCodigoCurto(codigo);
+        return urlRepository.findByCodigoCurto(codigo);
     }
 
     public void registrarAcesso(Url url) {
         url.setAcessos(url.getAcessos() + 1);
-        repository.save(url);
+        urlRepository.save(url);
     }
 
     private String gerarCodigo() {

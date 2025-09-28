@@ -1,7 +1,6 @@
 package br.com.casagrandi.encurtador.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,35 +11,69 @@ public class Url {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 2048)
+    @Column(name = "url_original", nullable = false, length = 2048)
     private String urlOriginal;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(name = "codigo_curto", nullable = false, unique = true, length = 10)
     private String codigoCurto;
 
+    @Column(name = "criado_em", nullable = false, updatable = false, insertable = false)
+    private LocalDateTime criadoEm;
+
     @Column(nullable = false)
-    private Long usuarioId;
-
-    private LocalDateTime criadoEm = LocalDateTime.now();
-
     private Long acessos = 0L;
 
+    // 🔑 Relacionamento com Usuario
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
     // Getters e Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getUrlOriginal() { return urlOriginal; }
-    public void setUrlOriginal(String urlOriginal) { this.urlOriginal = urlOriginal; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getCodigoCurto() { return codigoCurto; }
-    public void setCodigoCurto(String codigoCurto) { this.codigoCurto = codigoCurto; }
+    public String getUrlOriginal() {
+        return urlOriginal;
+    }
 
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+    public void setUrlOriginal(String urlOriginal) {
+        this.urlOriginal = urlOriginal;
+    }
 
-    public LocalDateTime getCriadoEm() { return criadoEm; }
-    public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
+    public String getCodigoCurto() {
+        return codigoCurto;
+    }
 
-    public Long getAcessos() { return acessos; }
-    public void setAcessos(Long acessos) { this.acessos = acessos; }
+    public void setCodigoCurto(String codigoCurto) {
+        this.codigoCurto = codigoCurto;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public Long getAcessos() {
+        return acessos;
+    }
+
+    public void setAcessos(Long acessos) {
+        this.acessos = acessos;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }
