@@ -9,6 +9,7 @@ import br.com.casagrandi.encurtador.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -48,6 +49,7 @@ public class UrlService {
 
     public void registrarAcesso(Url url) {
         url.setAcessos(url.getAcessos() + 1);
+        url.setUltimoAcesso(LocalDateTime.now());
         urlRepository.save(url);
     }
 

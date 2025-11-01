@@ -22,6 +22,9 @@ public class Url {
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
+    @Column(name = "ultimo_acesso")
+    private LocalDateTime ultimoAcesso;
+
     @Column(nullable = false)
     private Long acessos = 0L;
 
@@ -61,6 +64,14 @@ public class Url {
 
     public void setCriadoEm(LocalDateTime criadoEm) {
         this.criadoEm = criadoEm;
+    }
+
+    public LocalDateTime getUltimoAcesso() {
+        return ultimoAcesso;
+    }
+
+    public void setUltimoAcesso(LocalDateTime ultimoAcesso) {
+        this.ultimoAcesso = ultimoAcesso;
     }
 
     public Long getAcessos() {
