@@ -51,8 +51,16 @@ export interface UsuarioResponse {
   criadoEm: string;
 }
 
-export const encurtarUrl = async (urlOriginal: string): Promise<EncurtarResponse> => {
-  const response = await api.post<EncurtarResponse>('/api/encurtar', { urlOriginal });
+export const encurtarUrl = async (
+  data: EncurtarRequest,
+  username?: string,
+  password?: string
+): Promise<EncurtarResponse> => {
+  const config = username && password ? {
+    auth: { username, password }
+  } : {};
+  
+  const response = await api.post<EncurtarResponse>('/api/encurtar', data, config);
   return response.data;
 };
 

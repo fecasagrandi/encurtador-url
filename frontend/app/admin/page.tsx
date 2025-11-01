@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Link2, Trash2, Copy, Check, BarChart3, ExternalLink, LogOut } from 'lucide-react';
-import { listarUrls, obterEstatisticas, deletarUrl, UrlResponse, EstatisticasResponse } from '@/lib/api';
+import { listarUrls, obterEstatisticas, deletarUrl, encurtarUrl, UrlResponse, EstatisticasResponse } from '@/lib/api';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
+import Input from '@/components/Input';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -18,6 +19,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [urlOriginal, setUrlOriginal] = useState('');
+  const [encurtando, setEncurtando] = useState(false);
+  const [urlCriada, setUrlCriada] = useState<string | null>(null);
 
   useEffect(() => {
     const credentials = localStorage.getItem('credentials');
@@ -79,6 +83,27 @@ export default function AdminPage() {
     }
   };
 
+  const handleEncurtar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!urlOriginal.trim()) return;
+
+    setEncurtando(true);
+    setUrlCriada(null);
+
+    try {
+      const resultado = await encurtarUrl({ urlOriginal }, username, password);
+      setUrlCriada(resultado.codigoCurto);
+      setUrlOriginal('');
+      
+      await carregarDados(username, password);
+    } catch (err) {
+      console.error('Erro ao encurtar URL:', err);
+      alert('Erro ao encurtar URL. Verifique se a URL é válida.');
+    } finally {
+      setEncurtando(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('credentials');
     localStorage.removeItem('usuario');
@@ -132,6 +157,52 @@ export default function AdminPage() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Encurtar Nova URL</h2>
+          <form onSubmit={handleEncurtar} className="space-y-4">
+            <div>
+              <label htmlFor="urlOriginal" className="block text-sm font-medium text-gray-700 mb-2">
+                URL Original
+              </label>
+              <Input
+                id="urlOriginal"
+                type="url"
+                value={urlOriginal}
+                onChange={(e) => setUrlOriginal(e.target.value)}
+                placeholder="https://exemplo.com/sua-url-longa"
+                required
+                disabled={encurtando}
+              />
+            </div>
+
+            <Button type="submit" disabled={encurtando}>
+              {encurtando ? 'Encurtando...' : 'Encurtar URL'}
+            </Button>
+
+            {urlCriada && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800 font-medium mb-2">✅ URL encurtada com sucesso!</p>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={`http://localhost:8080/${urlCriada}`}
+                    readOnly
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`http://localhost:8080/${urlCriada}`);
+                      alert('URL copiada!');
+                    }}
+                    variant="secondary"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </form>
+        </Card>
+
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
@@ -201,7 +272,7 @@ export default function AdminPage() {
                         </p>
                       </td>
                       <td className="py-3 px-4">
-                        <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                        <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded font-mono">
                           {url.codigoCurto}
                         </code>
                       </td>
