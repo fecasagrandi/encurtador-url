@@ -1,13 +1,18 @@
 package br.com.casagrandi.encurtador.service;
 
+import br.com.casagrandi.encurtador.dto.EstatisticasResponse;
+import br.com.casagrandi.encurtador.dto.UrlResponse;
 import br.com.casagrandi.encurtador.model.Url;
 import br.com.casagrandi.encurtador.model.Usuario;
 import br.com.casagrandi.encurtador.repository.UrlRepository;
 import br.com.casagrandi.encurtador.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class UrlService {
@@ -16,15 +21,17 @@ public class UrlService {
     private final UsuarioRepository usuarioRepository;
     private final Random random = new Random();
 
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
+
     public UrlService(UrlRepository urlRepository, UsuarioRepository usuarioRepository) {
         this.urlRepository = urlRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
     public Url encurtar(Long usuarioId, String urlOriginal) {
-        // Busca o usuário pelo ID
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         Url url = new Url();
         url.setUsuario(usuario);
@@ -42,6 +49,52 @@ public class UrlService {
     public void registrarAcesso(Url url) {
         url.setAcessos(url.getAcessos() + 1);
         urlRepository.save(url);
+    }
+
+    public List<UrlResponse> listarUrlsDoUsuario(Long usuarioId) {
+        List<Url> urls = urlRepository.findByUsuarioIdOrderByCriadoEmDesc(usuarioId);
+        return urls.stream()
+                .map(this::converterParaResponse)
+                .collect(Collectors.toList());
+    }
+
+    public EstatisticasResponse obterEstatisticas(Long usuarioId) {
+        List<Url> urls = urlRepository.findByUsuarioIdOrderByCriadoEmDesc(usuarioId);
+        Long totalUrls = (long) urls.size();
+        Long totalAcessos = urlRepository.somarAcessosPorUsuario(usuarioId);
+        
+        if (totalAcessos == null) {
+            totalAcessos = 0L;
+        }
+
+        Optional<Url> urlMaisAcessada = urlRepository.findFirstByUsuarioIdOrderByAcessosDesc(usuarioId);
+        Long urlMaisAcessadaId = urlMaisAcessada.map(Url::getId).orElse(null);
+        Long acessosMaisAcessada = urlMaisAcessada.map(Url::getAcessos).orElse(0L);
+
+        return new EstatisticasResponse(totalUrls, totalAcessos, urlMaisAcessadaId, acessosMaisAcessada);
+    }
+
+    public void deletarUrl(Long id, Long usuarioId) {
+        Url url = urlRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("URL não encontrada"));
+        
+        if (!url.getUsuario().getId().equals(usuarioId)) {
+            throw new RuntimeException("Você não tem permissão para deletar esta URL");
+        }
+        
+        urlRepository.delete(url);
+    }
+
+    private UrlResponse converterParaResponse(Url url) {
+        String urlCurta = baseUrl + "/" + url.getCodigoCurto();
+        return new UrlResponse(
+                url.getId(),
+                url.getUrlOriginal(),
+                url.getCodigoCurto(),
+                urlCurta,
+                url.getAcessos(),
+                url.getCriadoEm()
+        );
     }
 
     private String gerarCodigo() {
