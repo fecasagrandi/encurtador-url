@@ -1,0 +1,70 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export interface EncurtarRequest {
+  urlOriginal: string;
+}
+
+export interface EncurtarResponse {
+  urlCurta: string;
+  codigoCurto: string;
+  urlOriginal: string;
+}
+
+export interface UrlResponse {
+  id: number;
+  urlOriginal: string;
+  codigoCurto: string;
+  urlCurta: string;
+  acessos: number;
+  criadoEm: string;
+}
+
+export interface EstatisticasResponse {
+  totalUrls: number;
+  totalAcessos: number;
+  urlMaisAcessada: number | null;
+  acessosMaisAcessada: number;
+}
+
+export const encurtarUrl = async (urlOriginal: string): Promise<EncurtarResponse> => {
+  const response = await api.post<EncurtarResponse>('/api/encurtar', { urlOriginal });
+  return response.data;
+};
+
+export const listarUrls = async (username: string, password: string): Promise<UrlResponse[]> => {
+  const response = await api.get<UrlResponse[]>('/api/admin/urls', {
+    auth: {
+      username,
+      password,
+    },
+  });
+  return response.data;
+};
+
+export const obterEstatisticas = async (username: string, password: string): Promise<EstatisticasResponse> => {
+  const response = await api.get<EstatisticasResponse>('/api/admin/estatisticas', {
+    auth: {
+      username,
+      password,
+    },
+  });
+  return response.data;
+};
+
+export const deletarUrl = async (id: number, username: string, password: string): Promise<void> => {
+  await api.delete(`/api/admin/urls/${id}`, {
+    auth: {
+      username,
+      password,
+    },
+  });
+};
+
+export default api;
