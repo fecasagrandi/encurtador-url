@@ -33,6 +33,24 @@ export interface EstatisticasResponse {
   acessosMaisAcessada: number;
 }
 
+export interface UsuarioRequest {
+  nomeUsuario: string;
+  email: string;
+  senha: string;
+}
+
+export interface LoginRequest {
+  nomeUsuario: string;
+  senha: string;
+}
+
+export interface UsuarioResponse {
+  id: number;
+  nomeUsuario: string;
+  email: string;
+  criadoEm: string;
+}
+
 export const encurtarUrl = async (urlOriginal: string): Promise<EncurtarResponse> => {
   const response = await api.post<EncurtarResponse>('/api/encurtar', { urlOriginal });
   return response.data;
@@ -65,6 +83,16 @@ export const deletarUrl = async (id: number, username: string, password: string)
       password,
     },
   });
+};
+
+export const cadastrarUsuario = async (dados: UsuarioRequest): Promise<UsuarioResponse> => {
+  const response = await api.post<UsuarioResponse>('/api/usuarios/cadastro', dados);
+  return response.data;
+};
+
+export const loginUsuario = async (dados: LoginRequest): Promise<UsuarioResponse> => {
+  const response = await api.post<UsuarioResponse>('/api/usuarios/login', dados);
+  return response.data;
 };
 
 export default api;

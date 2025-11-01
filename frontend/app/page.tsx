@@ -61,9 +61,14 @@ export default function Home() {
             <Link2 className="w-6 h-6 text-blue-600" />
             <h1 className="text-xl font-bold text-gray-900">Encurtador de URL</h1>
           </div>
-          <Link href="/admin">
-            <Button variant="secondary">Dashboard Admin</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/login">
+              <Button variant="secondary">Entrar</Button>
+            </Link>
+            <Link href="/cadastro">
+              <Button>Cadastrar</Button>
+            </Link>
+          </div>
         </div>
       </nav>
 
