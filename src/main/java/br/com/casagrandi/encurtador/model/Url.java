@@ -1,6 +1,7 @@
 package br.com.casagrandi.encurtador.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +18,8 @@ public class Url {
     @Column(name = "codigo_curto", nullable = false, unique = true, length = 10)
     private String codigoCurto;
 
-    @Column(name = "criado_em", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
+    @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
     @Column(nullable = false)

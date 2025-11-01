@@ -53,11 +53,19 @@ export default function CadastroPage() {
       alert('Cadastro realizado com sucesso! Faça login para continuar.');
       router.push('/login');
     } catch (err: any) {
-      const errorMsg = err.response?.data?.nomeUsuario || 
-                       err.response?.data?.email || 
-                       err.response?.data?.senha ||
-                       'Erro ao cadastrar usuário';
-      setError(errorMsg);
+      console.error('Erro ao cadastrar:', err);
+      
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        const errorMsg = errorData.nomeUsuario || 
+                         errorData.email || 
+                         errorData.senha ||
+                         errorData.message ||
+                         'Erro ao cadastrar usuário';
+        setError(errorMsg);
+      } else {
+        setError('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+      }
     } finally {
       setLoading(false);
     }

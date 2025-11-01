@@ -29,8 +29,9 @@ export default function AdminPage() {
       carregarDados(user, pass);
     } else {
       setLoading(false);
+      router.push('/login');
     }
-  }, []);
+  }, [router]);
 
   const carregarDados = async (user: string, pass: string) => {
     try {
@@ -41,32 +42,13 @@ export default function AdminPage() {
       setUrls(urlsData);
       setStats(statsData);
       setAuthenticated(true);
+      setLoading(false);
     } catch (err) {
+      console.error('Erro ao carregar dados:', err);
       localStorage.removeItem('credentials');
       localStorage.removeItem('usuario');
+      setLoading(false);
       router.push('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const [urlsData, statsData] = await Promise.all([
-        listarUrls(username, password),
-        obterEstatisticas(username, password),
-      ]);
-      setUrls(urlsData);
-      setStats(statsData);
-      setAuthenticated(true);
-    } catch (err: any) {
-      setError('Credenciais inválidas');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -120,8 +102,13 @@ export default function AdminPage() {
   }
 
   if (!authenticated) {
-    router.push('/login');
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Redirecionando para login...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
