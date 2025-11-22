@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Link2, Copy, Check, ExternalLink } from 'lucide-react';
+import { Link2, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
 import { encurtarUrl } from '@/lib/api';
+import { validateUrlInput, formatUrl } from '@/lib/validation';
+import { useToast } from '@/lib/useToast';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
+import Toast from '@/components/Toast';
 
 export default function Home() {
   const [urlOriginal, setUrlOriginal] = useState('');
@@ -14,6 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   const handleEncurtar = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,23 +25,23 @@ export default function Home() {
     setUrlCurta('');
     setCopied(false);
 
-    if (!urlOriginal.trim()) {
-      setError('Por favor, insira uma URL');
-      return;
-    }
-
-    if (!urlOriginal.startsWith('http://') && !urlOriginal.startsWith('https://')) {
-      setError('URL deve começar com http:// ou https://');
+    const validation = validateUrlInput(urlOriginal);
+    if (!validation.isValid) {
+      setError(validation.error!);
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await encurtarUrl(urlOriginal);
+      const formattedUrl = formatUrl(urlOriginal.trim());
+      const response = await encurtarUrl({ urlOriginal: formattedUrl });
       setUrlCurta(response.urlCurta);
+      showToast('URL encurtada com sucesso!', 'success');
     } catch (err: any) {
-      setError(err.response?.data?.urlOriginal || 'Erro ao encurtar URL');
+      const errorMsg = err.response?.data?.urlOriginal || 'Erro ao encurtar URL';
+      setError(errorMsg);
+      showToast(errorMsg, 'error');
     } finally {
       setLoading(false);
     }
@@ -47,9 +51,11 @@ export default function Home() {
     try {
       await navigator.clipboard.writeText(urlCurta);
       setCopied(true);
+      showToast('URL copiada para a área de transferência!', 'success');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Erro ao copiar:', err);
+      showToast('Erro ao copiar URL', 'error');
     }
   };
 
@@ -74,11 +80,16 @@ export default function Home() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Encurte suas URLs
-          </h2>
-          <p className="text-lg text-gray-600">
-            Transforme URLs longas em links curtos e fáceis de compartilhar
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
+            <h2 className="text-4xl font-bold text-gray-900">
+              Encurte suas URLs
+            </h2>
+            <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Transforme URLs longas em links curtos e fáceis de compartilhar. 
+            Gerencie, monitore e analise seus links com facilidade.
           </p>
         </div>
 
@@ -114,8 +125,9 @@ export default function Home() {
           </form>
 
           {urlCurta && (
-            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 mb-2">
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg animate-in slide-in-from-bottom-2">
+              <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600" />
                 URL encurtada com sucesso!
               </p>
               <div className="flex items-center gap-2">
@@ -123,16 +135,16 @@ export default function Home() {
                   type="text"
                   value={urlCurta}
                   readOnly
-                  className="flex-1"
+                  className="flex-1 bg-white"
                 />
                 <Button
                   onClick={handleCopy}
                   variant="secondary"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 transition-all hover:scale-105"
                 >
                   {copied ? (
                     <>
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 text-green-600" />
                       Copiado!
                     </>
                   ) : (
@@ -147,7 +159,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Button variant="secondary">
+                  <Button variant="secondary" className="transition-all hover:scale-105">
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </a>
@@ -188,6 +200,13 @@ export default function Home() {
           </Card>
         </div>
       </main>
+      
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 }

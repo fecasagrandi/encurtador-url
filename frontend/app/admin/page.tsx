@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Link2, Trash2, Copy, Check, BarChart3, ExternalLink, LogOut } from 'lucide-react';
 import { listarUrls, obterEstatisticas, deletarUrl, encurtarUrl, UrlResponse, EstatisticasResponse } from '@/lib/api';
+import { useToast } from '@/lib/useToast';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import Input from '@/components/Input';
+import Toast from '@/components/Toast';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function AdminPage() {
   const [urlOriginal, setUrlOriginal] = useState('');
   const [encurtando, setEncurtando] = useState(false);
   const [urlCriada, setUrlCriada] = useState<string | null>(null);
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     const credentials = localStorage.getItem('credentials');
@@ -69,7 +72,7 @@ export default function AdminPage() {
         });
       }
     } catch (err) {
-      alert('Erro ao deletar URL');
+      showToast('Erro ao deletar URL', 'error');
     }
   };
 
@@ -98,7 +101,7 @@ export default function AdminPage() {
       await carregarDados(username, password);
     } catch (err) {
       console.error('Erro ao encurtar URL:', err);
-      alert('Erro ao encurtar URL. Verifique se a URL é válida.');
+      showToast('Erro ao encurtar URL. Verifique se a URL é válida.', 'error');
     } finally {
       setEncurtando(false);
     }
@@ -191,7 +194,7 @@ export default function AdminPage() {
                   <Button
                     onClick={() => {
                       navigator.clipboard.writeText(`http://localhost:8080/${urlCriada}`);
-                      alert('URL copiada!');
+                      showToast('URL copiada!', 'success');
                     }}
                     variant="secondary"
                   >
@@ -320,6 +323,13 @@ export default function AdminPage() {
           )}
         </Card>
       </main>
+      
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 }

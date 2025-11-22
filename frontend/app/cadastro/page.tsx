@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Link2, UserPlus } from 'lucide-react';
 import { cadastrarUsuario } from '@/lib/api';
+import { useToast } from '@/lib/useToast';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
+import Toast from '@/components/Toast';
 
 export default function CadastroPage() {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function CadastroPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { toast, showToast, hideToast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -50,8 +53,8 @@ export default function CadastroPage() {
         senha: formData.senha,
       });
       
-      alert('Cadastro realizado com sucesso! Faça login para continuar.');
-      router.push('/login');
+      showToast('Cadastro realizado com sucesso! Redirecionando para login...', 'success');
+      setTimeout(() => router.push('/login'), 2000);
     } catch (err: any) {
       console.error('Erro ao cadastrar:', err);
       
@@ -171,6 +174,13 @@ export default function CadastroPage() {
           </Link>
         </form>
       </Card>
+      
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 }
