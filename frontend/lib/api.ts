@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://encurtador-backend.kaizenapp.com.br',
   headers: {
     'Content-Type': 'application/json',
   },
