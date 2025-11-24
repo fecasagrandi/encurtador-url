@@ -1,12 +1,20 @@
-# ====== BUILD ======
-FROM node:20 AS build
+# ===== BASE =====
+FROM node:20-alpine AS base
 WORKDIR /app
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
+
+# ===== BUILD =====
+FROM base AS build
 COPY . .
 RUN npm run build
 
-# ====== RUN ======
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+# ===== RUN =====
+FROM base AS production
+ENV NODE_ENV=production
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
+EXPOSE 3000
+CMD ["npm", "start"]
