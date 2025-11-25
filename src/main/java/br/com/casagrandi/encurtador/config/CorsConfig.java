@@ -9,10 +9,16 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        // CORS para todas as rotas (API, health, redirecionamento)
+        registry.addMapping("/**")
+                .allowedOrigins(
+                    "http://localhost:3000",
+                    "https://encurtador.kaizenapp.com.br",
+                    "https://encurtador-frontend.kaizenapp.com.br"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }

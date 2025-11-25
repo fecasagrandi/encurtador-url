@@ -4,6 +4,7 @@ import br.com.casagrandi.encurtador.dto.EncurtarRequest;
 import br.com.casagrandi.encurtador.dto.EncurtarResponse;
 import br.com.casagrandi.encurtador.dto.EstatisticasResponse;
 import br.com.casagrandi.encurtador.dto.UrlResponse;
+import br.com.casagrandi.encurtador.exception.UrlNaoEncontradaException;
 import br.com.casagrandi.encurtador.model.Url;
 import br.com.casagrandi.encurtador.model.Usuario;
 import br.com.casagrandi.encurtador.repository.UsuarioRepository;
@@ -61,14 +62,25 @@ public class UrlController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Redireciona para a URL original baseado no código curto.
+     * Valida se o código não está vazio para evitar conflito com rota raiz.
+     */
     @GetMapping("/{codigo}")
     public RedirectView redirecionar(@PathVariable String codigo) {
+        // Validação: código não pode ser vazio ou nulo
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("Código da URL não pode ser vazio");
+        }
+        
         return service.buscarPorCodigo(codigo)
                 .map(url -> {
                     service.registrarAcesso(url);
-                    return new RedirectView(url.getUrlOriginal());
+                    RedirectView redirectView = new RedirectView(url.getUrlOriginal());
+                    redirectView.setStatusCode(org.springframework.http.HttpStatus.FOUND); // 302
+                    return redirectView;
                 })
-                .orElseThrow(() -> new RuntimeException("Código não encontrado"));
+                .orElseThrow(() -> new UrlNaoEncontradaException(codigo));
     }
 
     @GetMapping("/api/admin/urls")
