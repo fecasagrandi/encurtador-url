@@ -10,6 +10,7 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
 import Toast from '@/components/Toast';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function CadastroPage() {
   const router = useRouter();
@@ -75,19 +76,22 @@ export default function CadastroPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <UserPlus className="w-8 h-8 text-blue-600" />
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserPlus className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Criar Conta</h1>
-          <p className="text-gray-600">Preencha os dados para se cadastrar</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Criar Conta</h1>
+          <p className="text-gray-600 dark:text-gray-400">Preencha os dados para se cadastrar</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="nomeUsuario" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="nomeUsuario" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nome de Usuário
             </label>
             <Input
@@ -103,7 +107,7 @@ export default function CadastroPage() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <Input
@@ -119,7 +123,7 @@ export default function CadastroPage() {
           </div>
 
           <div>
-            <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="senha" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Senha
             </label>
             <Input
@@ -135,7 +139,7 @@ export default function CadastroPage() {
           </div>
 
           <div>
-            <label htmlFor="confirmarSenha" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="confirmarSenha" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Confirmar Senha
             </label>
             <Input
@@ -151,7 +155,7 @@ export default function CadastroPage() {
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg text-red-700 dark:text-red-200 text-sm">
               {error}
             </div>
           )}
@@ -160,9 +164,9 @@ export default function CadastroPage() {
             {loading ? 'Cadastrando...' : 'Cadastrar'}
           </Button>
 
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
             Já tem uma conta?{' '}
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
               Fazer login
             </Link>
           </div>
