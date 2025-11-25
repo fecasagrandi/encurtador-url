@@ -16,7 +16,7 @@ public class SaudeController {
         return Map.of(
             "api", "encurtador-url",
             "status", "ativa",
-            "versao", "1.0.0"
+            "versao", "2.0.0"
         );
     }
 
