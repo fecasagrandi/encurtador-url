@@ -1,5 +1,6 @@
 package br.com.casagrandi.encurtador.api;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -7,6 +8,9 @@ import java.util.Map;
 
 @RestController
 public class SaudeController {
+
+    @Value("${app.base-url:NAO_CONFIGURADO}")
+    private String baseUrl;
 
     /**
      * Endpoint raiz - evita 404/500 quando acessam a raiz do domínio
@@ -16,7 +20,8 @@ public class SaudeController {
         return Map.of(
             "api", "encurtador-url",
             "status", "ativa",
-            "versao", "2.0.0"
+            "versao", "2.0.0",
+            "baseUrl", baseUrl
         );
     }
 
