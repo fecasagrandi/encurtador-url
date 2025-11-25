@@ -1,42 +1,57 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Link2, Trash2, Copy, Check, BarChart3, ExternalLink, LogOut } from 'lucide-react';
-import { listarUrls, obterEstatisticas, deletarUrl, encurtarUrl, UrlResponse, EstatisticasResponse } from '@/lib/api';
-import { useToast } from '@/lib/useToast';
-import Button from '@/components/Button';
-import Card from '@/components/Card';
-import Input from '@/components/Input';
-import Toast from '@/components/Toast';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Link2,
+  Trash2,
+  Copy,
+  Check,
+  BarChart3,
+  ExternalLink,
+  LogOut,
+} from "lucide-react";
+import {
+  listarUrls,
+  obterEstatisticas,
+  deletarUrl,
+  encurtarUrl,
+  UrlResponse,
+  EstatisticasResponse,
+} from "@/lib/api";
+import { useToast } from "@/lib/useToast";
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import Input from "@/components/Input";
+import Toast from "@/components/Toast";
 
 export default function AdminPage() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [urls, setUrls] = useState<UrlResponse[]>([]);
   const [stats, setStats] = useState<EstatisticasResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState<number | null>(null);
-  const [urlOriginal, setUrlOriginal] = useState('');
+  const [urlOriginal, setUrlOriginal] = useState("");
   const [encurtando, setEncurtando] = useState(false);
   const [urlCriada, setUrlCriada] = useState<string | null>(null);
   const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
-    const credentials = localStorage.getItem('credentials');
+    const credentials = localStorage.getItem("credentials");
     if (credentials) {
       const decoded = atob(credentials);
-      const [user, pass] = decoded.split(':');
+      const [user, pass] = decoded.split(":");
       setUsername(user);
       setPassword(pass);
       carregarDados(user, pass);
     } else {
       setLoading(false);
-      router.push('/login');
+      router.push("/login");
     }
   }, [router]);
 
@@ -51,16 +66,16 @@ export default function AdminPage() {
       setAuthenticated(true);
       setLoading(false);
     } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-      localStorage.removeItem('credentials');
-      localStorage.removeItem('usuario');
+      console.error("Erro ao carregar dados:", err);
+      localStorage.removeItem("credentials");
+      localStorage.removeItem("usuario");
       setLoading(false);
-      router.push('/login');
+      router.push("/login");
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Tem certeza que deseja deletar esta URL?')) return;
+    if (!confirm("Tem certeza que deseja deletar esta URL?")) return;
 
     try {
       await deletarUrl(id, username, password);
@@ -72,7 +87,7 @@ export default function AdminPage() {
         });
       }
     } catch (err) {
-      showToast('Erro ao deletar URL', 'error');
+      showToast("Erro ao deletar URL", "error");
     }
   };
 
@@ -82,7 +97,7 @@ export default function AdminPage() {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error('Erro ao copiar:', err);
+      console.error("Erro ao copiar:", err);
     }
   };
 
@@ -96,26 +111,26 @@ export default function AdminPage() {
     try {
       const resultado = await encurtarUrl({ urlOriginal }, username, password);
       setUrlCriada(resultado.codigoCurto);
-      setUrlOriginal('');
-      
+      setUrlOriginal("");
+
       await carregarDados(username, password);
     } catch (err) {
-      console.error('Erro ao encurtar URL:', err);
-      showToast('Erro ao encurtar URL. Verifique se a URL é válida.', 'error');
+      console.error("Erro ao encurtar URL:", err);
+      showToast("Erro ao encurtar URL. Verifique se a URL é válida.", "error");
     } finally {
       setEncurtando(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('credentials');
-    localStorage.removeItem('usuario');
+    localStorage.removeItem("credentials");
+    localStorage.removeItem("usuario");
     setAuthenticated(false);
-    setUsername('');
-    setPassword('');
+    setUsername("");
+    setPassword("");
     setUrls([]);
     setStats(null);
-    router.push('/login');
+    router.push("/login");
   };
 
   if (loading) {
@@ -151,7 +166,11 @@ export default function AdminPage() {
             <Link href="/">
               <Button variant="secondary">Home</Button>
             </Link>
-            <Button variant="secondary" onClick={handleLogout} className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
               <LogOut className="w-4 h-4" />
               Sair
             </Button>
@@ -161,10 +180,15 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Encurtar Nova URL</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Encurtar Nova URL
+          </h2>
           <form onSubmit={handleEncurtar} className="space-y-4">
             <div>
-              <label htmlFor="urlOriginal" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="urlOriginal"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 URL Original
               </label>
               <Input
@@ -179,12 +203,14 @@ export default function AdminPage() {
             </div>
 
             <Button type="submit" disabled={encurtando}>
-              {encurtando ? 'Encurtando...' : 'Encurtar URL'}
+              {encurtando ? "Encurtando..." : "Encurtar URL"}
             </Button>
 
             {urlCriada && (
               <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-800 font-medium mb-2">✅ URL encurtada com sucesso!</p>
+                <p className="text-sm text-green-800 font-medium mb-2">
+                  ✅ URL encurtada com sucesso!
+                </p>
                 <div className="flex items-center gap-2">
                   <Input
                     value={`http://localhost:8080/${urlCriada}`}
@@ -193,8 +219,10 @@ export default function AdminPage() {
                   />
                   <Button
                     onClick={() => {
-                      navigator.clipboard.writeText(`http://localhost:8080/${urlCriada}`);
-                      showToast('URL copiada!', 'success');
+                      navigator.clipboard.writeText(
+                        `http://localhost:8080/${urlCriada}`
+                      );
+                      showToast("URL copiada!", "success");
                     }}
                     variant="secondary"
                   >
@@ -212,7 +240,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total de URLs</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalUrls}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.totalUrls}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <Link2 className="w-6 h-6 text-blue-600" />
@@ -224,7 +254,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total de Acessos</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalAcessos}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.totalAcessos}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <BarChart3 className="w-6 h-6 text-green-600" />
@@ -236,7 +268,9 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Mais Acessada</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.acessosMaisAcessada}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.acessosMaisAcessada}
+                  </p>
                   <p className="text-xs text-gray-500">cliques</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
@@ -251,27 +285,43 @@ export default function AdminPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">Suas URLs</h2>
 
           {urls.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">Nenhuma URL encurtada ainda</p>
+            <p className="text-center text-gray-500 py-8">
+              Nenhuma URL encurtada ainda
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">URL Original</th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Código</th>
-                    <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Acessos</th>
-                    <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">Ações</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
+                      URL Original
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
+                      Código
+                    </th>
+                    <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">
+                      Acessos
+                    </th>
+                    <th className="text-center py-3 px-4 text-sm font-semibold text-gray-700">
+                      Ações
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {urls.map((url) => (
-                    <tr key={url.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr
+                      key={url.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
                       <td className="py-3 px-4">
-                        <p className="text-sm text-gray-900 truncate max-w-md" title={url.urlOriginal}>
+                        <p
+                          className="text-sm text-gray-900 truncate max-w-md"
+                          title={url.urlOriginal}
+                        >
                           {url.urlOriginal}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {new Date(url.criadoEm).toLocaleDateString('pt-BR')}
+                          {new Date(url.criadoEm).toLocaleDateString("pt-BR")}
                         </p>
                       </td>
                       <td className="py-3 px-4">
@@ -323,7 +373,7 @@ export default function AdminPage() {
           )}
         </Card>
       </main>
-      
+
       <Toast
         message={toast.message}
         type={toast.type}

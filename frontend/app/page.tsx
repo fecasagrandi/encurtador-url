@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Link2, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
-import { encurtarUrl } from '@/lib/api';
-import { validateUrlInput, formatUrl } from '@/lib/validation';
-import { useToast } from '@/lib/useToast';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import Card from '@/components/Card';
-import Toast from '@/components/Toast';
+import { useState } from "react";
+import Link from "next/link";
+import { Link2, Copy, Check, ExternalLink, Sparkles } from "lucide-react";
+import { encurtarUrlPublico } from "@/lib/api";
+import { validateUrlInput, formatUrl } from "@/lib/validation";
+import { useToast } from "@/lib/useToast";
+import Button from "@/components/Button";
+import Input from "@/components/Input";
+import Card from "@/components/Card";
+import Toast from "@/components/Toast";
 
 export default function Home() {
-  const [urlOriginal, setUrlOriginal] = useState('');
-  const [urlCurta, setUrlCurta] = useState('');
+  const [urlOriginal, setUrlOriginal] = useState("");
+  const [urlCurta, setUrlCurta] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const { toast, showToast, hideToast } = useToast();
 
   const handleEncurtar = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setUrlCurta('');
+    setError("");
+    setUrlCurta("");
     setCopied(false);
 
     const validation = validateUrlInput(urlOriginal);
@@ -35,13 +35,14 @@ export default function Home() {
 
     try {
       const formattedUrl = formatUrl(urlOriginal.trim());
-      const response = await encurtarUrl({ urlOriginal: formattedUrl });
+      const response = await encurtarUrlPublico({ urlOriginal: formattedUrl });
       setUrlCurta(response.urlCurta);
-      showToast('URL encurtada com sucesso!', 'success');
+      showToast("URL encurtada com sucesso!", "success");
     } catch (err: any) {
-      const errorMsg = err.response?.data?.urlOriginal || 'Erro ao encurtar URL';
+      const errorMsg =
+        err.response?.data?.urlOriginal || "Erro ao encurtar URL";
       setError(errorMsg);
-      showToast(errorMsg, 'error');
+      showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }
@@ -51,11 +52,11 @@ export default function Home() {
     try {
       await navigator.clipboard.writeText(urlCurta);
       setCopied(true);
-      showToast('URL copiada para a área de transferência!', 'success');
+      showToast("URL copiada para a área de transferência!", "success");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Erro ao copiar:', err);
-      showToast('Erro ao copiar URL', 'error');
+      console.error("Erro ao copiar:", err);
+      showToast("Erro ao copiar URL", "error");
     }
   };
 
@@ -65,7 +66,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Link2 className="w-6 h-6 text-blue-600" />
-            <h1 className="text-xl font-bold text-gray-900">Encurtador de URL</h1>
+            <h1 className="text-xl font-bold text-gray-900">
+              Encurtador de URL
+            </h1>
           </div>
           <div className="flex gap-2">
             <Link href="/login">
@@ -88,7 +91,7 @@ export default function Home() {
             <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Transforme URLs longas em links curtos e fáceis de compartilhar. 
+            Transforme URLs longas em links curtos e fáceis de compartilhar.
             Gerencie, monitore e analise seus links com facilidade.
           </p>
         </div>
@@ -96,7 +99,10 @@ export default function Home() {
         <Card>
           <form onSubmit={handleEncurtar} className="space-y-4">
             <div>
-              <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="url"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Cole sua URL longa aqui
               </label>
               <Input
@@ -115,12 +121,8 @@ export default function Home() {
               </div>
             )}
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? 'Encurtando...' : 'Encurtar URL'}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Encurtando..." : "Encurtar URL"}
             </Button>
           </form>
 
@@ -154,12 +156,11 @@ export default function Home() {
                     </>
                   )}
                 </Button>
-                <a
-                  href={urlCurta}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="secondary" className="transition-all hover:scale-105">
+                <a href={urlCurta} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    variant="secondary"
+                    className="transition-all hover:scale-105"
+                  >
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </a>
@@ -173,10 +174,10 @@ export default function Home() {
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Link2 className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Rápido e Simples</h3>
-            <p className="text-sm text-gray-600">
-              Encurte URLs em segundos
-            </p>
+            <h3 className="font-semibold text-gray-900 mb-2">
+              Rápido e Simples
+            </h3>
+            <p className="text-sm text-gray-600">Encurte URLs em segundos</p>
           </Card>
 
           <Card className="text-center">
@@ -184,9 +185,7 @@ export default function Home() {
               <Check className="w-6 h-6 text-green-600" />
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">Confiável</h3>
-            <p className="text-sm text-gray-600">
-              Links sempre disponíveis
-            </p>
+            <p className="text-sm text-gray-600">Links sempre disponíveis</p>
           </Card>
 
           <Card className="text-center">
@@ -194,13 +193,11 @@ export default function Home() {
               <ExternalLink className="w-6 h-6 text-purple-600" />
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">Rastreável</h3>
-            <p className="text-sm text-gray-600">
-              Acompanhe cliques e acessos
-            </p>
+            <p className="text-sm text-gray-600">Acompanhe cliques e acessos</p>
           </Card>
         </div>
       </main>
-      
+
       <Toast
         message={toast.message}
         type={toast.type}

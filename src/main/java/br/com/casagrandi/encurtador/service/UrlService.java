@@ -30,12 +30,29 @@ public class UrlService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    /**
+     * Encurta URL para usuário autenticado (com histórico)
+     */
     public Url encurtar(Long usuarioId, String urlOriginal) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         Url url = new Url();
         url.setUsuario(usuario);
+        url.setUrlOriginal(urlOriginal);
+        url.setCodigoCurto(gerarCodigo());
+        url.setAcessos(0L);
+
+        return urlRepository.save(url);
+    }
+
+    /**
+     * Encurta URL anonimamente (sem usuário vinculado)
+     * Funciona, mas não aparece no histórico de ninguém
+     */
+    public Url encurtarAnonimo(String urlOriginal) {
+        Url url = new Url();
+        url.setUsuario(null); // URL anônima
         url.setUrlOriginal(urlOriginal);
         url.setCodigoCurto(gerarCodigo());
         url.setAcessos(0L);

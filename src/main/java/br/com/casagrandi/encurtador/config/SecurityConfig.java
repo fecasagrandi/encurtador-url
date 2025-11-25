@@ -31,6 +31,7 @@ public class SecurityConfig {
                         // Rotas públicas
                         .requestMatchers("/", "/health", "/api/saude").permitAll()
                         .requestMatchers("/api/usuarios/**").permitAll()
+                        .requestMatchers("/api/encurtar/publico").permitAll()
                         .requestMatchers("/{codigo}").permitAll()
                         // Rotas autenticadas
                         .requestMatchers("/api/admin/**", "/api/encurtar").authenticated()

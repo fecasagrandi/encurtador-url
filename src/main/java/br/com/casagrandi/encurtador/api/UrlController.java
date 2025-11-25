@@ -44,6 +44,30 @@ public class UrlController {
         return usuario.getId();
     }
 
+    /**
+     * Encurtar URL PÚBLICA (sem login) - URLs anônimas
+     * Qualquer pessoa pode encurtar, mas não terá histórico/estatísticas
+     */
+    @PostMapping("/api/encurtar/publico")
+    public ResponseEntity<EncurtarResponse> encurtarPublico(
+            @Valid @RequestBody EncurtarRequest request
+    ) {
+        Url url = service.encurtarAnonimo(request.getUrlOriginal());
+
+        String urlCurta = baseUrl + "/" + url.getCodigoCurto();
+        EncurtarResponse response = new EncurtarResponse(
+                urlCurta,
+                url.getCodigoCurto(),
+                url.getUrlOriginal()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Encurtar URL AUTENTICADA - vinculada ao usuário logado
+     * Usuário terá histórico e estatísticas
+     */
     @PostMapping("/api/encurtar")
     public ResponseEntity<EncurtarResponse> encurtar(
             @Valid @RequestBody EncurtarRequest request,
