@@ -24,7 +24,7 @@ public class UrlController {
     private final UrlService service;
     private final UsuarioRepository usuarioRepository;
 
-    @Value("${app.base-url:http://localhost:8080}")
+    @Value("${app.base-url:https://encurtador-backend.kaizenapp.com.br}")
     private String baseUrl;
 
     public UrlController(UrlService service, UsuarioRepository usuarioRepository) {

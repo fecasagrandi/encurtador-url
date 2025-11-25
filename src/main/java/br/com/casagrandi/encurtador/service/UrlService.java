@@ -22,7 +22,7 @@ public class UrlService {
     private final UsuarioRepository usuarioRepository;
     private final Random random = new Random();
 
-    @Value("${app.base-url:http://localhost:8080}")
+    @Value("${app.base-url:https://encurtador-backend.kaizenapp.com.br}")
     private String baseUrl;
 
     public UrlService(UrlRepository urlRepository, UsuarioRepository usuarioRepository) {
