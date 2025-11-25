@@ -110,7 +110,7 @@ export default function AdminPage() {
 
     try {
       const resultado = await encurtarUrl({ urlOriginal }, username, password);
-      setUrlCriada(resultado.codigoCurto);
+      setUrlCriada(resultado.urlCurta);
       setUrlOriginal("");
 
       await carregarDados(username, password);
@@ -212,16 +212,10 @@ export default function AdminPage() {
                   ✅ URL encurtada com sucesso!
                 </p>
                 <div className="flex items-center gap-2">
-                  <Input
-                    value={`http://localhost:8080/${urlCriada}`}
-                    readOnly
-                    className="flex-1"
-                  />
+                  <Input value={urlCriada} readOnly className="flex-1" />
                   <Button
                     onClick={() => {
-                      navigator.clipboard.writeText(
-                        `http://localhost:8080/${urlCriada}`
-                      );
+                      navigator.clipboard.writeText(urlCriada);
                       showToast("URL copiada!", "success");
                     }}
                     variant="secondary"

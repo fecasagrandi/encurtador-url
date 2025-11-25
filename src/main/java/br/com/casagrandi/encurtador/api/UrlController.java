@@ -110,7 +110,7 @@ public class UrlController {
     @GetMapping("/api/admin/urls")
     public ResponseEntity<List<UrlResponse>> listarUrls(Authentication authentication) {
         Long usuarioId = obterUsuarioIdAutenticado(authentication);
-        List<UrlResponse> urls = service.listarUrlsDoUsuario(usuarioId);
+        List<UrlResponse> urls = service.listarUrlsDoUsuario(usuarioId, baseUrl);
         return ResponseEntity.ok(urls);
     }
 

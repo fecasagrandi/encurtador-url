@@ -22,8 +22,7 @@ public class UrlService {
     private final UsuarioRepository usuarioRepository;
     private final Random random = new Random();
 
-    @Value("${app.base-url:https://encurtador-backend.kaizenapp.com.br}")
-    private String baseUrl;
+    // baseUrl removido do service - será passado como parâmetro
 
     public UrlService(UrlRepository urlRepository, UsuarioRepository usuarioRepository) {
         this.urlRepository = urlRepository;
@@ -70,10 +69,10 @@ public class UrlService {
         urlRepository.save(url);
     }
 
-    public List<UrlResponse> listarUrlsDoUsuario(Long usuarioId) {
+    public List<UrlResponse> listarUrlsDoUsuario(Long usuarioId, String baseUrl) {
         List<Url> urls = urlRepository.findByUsuarioIdOrderByCriadoEmDesc(usuarioId);
         return urls.stream()
-                .map(this::converterParaResponse)
+                .map(url -> converterParaResponse(url, baseUrl))
                 .collect(Collectors.toList());
     }
 
@@ -104,7 +103,7 @@ public class UrlService {
         urlRepository.delete(url);
     }
 
-    private UrlResponse converterParaResponse(Url url) {
+    private UrlResponse converterParaResponse(Url url, String baseUrl) {
         String urlCurta = baseUrl + "/" + url.getCodigoCurto();
         return new UrlResponse(
                 url.getId(),
